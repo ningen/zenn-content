@@ -1,0 +1,14 @@
+{
+  "title": "デコレーターのお勉強",
+  "closed": false,
+  "archived": false,
+  "created_at": "2022-09-27",
+  "comments": [
+    {
+      "author": "ningen",
+      "created_at": "2022-09-27",
+      "body_markdown": "## メソッドデコレーター\n\n思っていたよりめちゃくちゃ簡単。\n\nLoggingデコレーターはDebug作業とかに役立たせることができそう\n\n```typescript\n// keyはtask名, valueは呼び出す関数\nconst subscribeMap: { [key in string]: Function } = {};\n\nfunction log(logLevel: string, msg: string): void {\n  switch (logLevel) {\n    case \"info\":\n      return console.info(msg);\n    case \"log\":\n      return console.log(msg);\n    case \"warn\":\n      return console.warn(msg);\n    case \"error\":\n      return console.error(msg);\n    case \"debug\":\n      return console.debug(msg);\n  }\n}\n\n// task名をつけてmethodデコレーターとして登録すると、methodの処理後に該当のtaskを呼び出す\nexport function afterCallTask(name: string): MethodDecorator {\n  return (\n    _target: unknown,\n    _propertyKey: string | symbol,\n    descriptor: PropertyDescriptor,\n  ) => {\n    const func = descriptor.value;\n    descriptor.value = function (...args: unknown[]) {\n      const result = func.apply(this, args);\n      subscribeMap[name](result);\n      return result;\n    };\n  };\n}\n\n// taskの宣言。\nexport function defineTask(name: string): MethodDecorator {\n  return (\n    _target: unknown,\n    _propertyKey: string | symbol,\n    descriptor: PropertyDescriptor,\n  ) => {\n    const func = descriptor.value; \n    subscribeMap[name] = (...args: unknown[]) => func.apply(descriptor, args);\n  };\n}\n\nexport function Logging(logLevel: string): MethodDecorator {\n  return (\n    _target: unknown,\n    propertyKey: string | symbol,\n    descriptor: PropertyDescriptor,\n  ) => {\n    const func = descriptor.value;\n    const strPropertykey = typeof propertyKey === \"symbol\"\n      ? propertyKey.toString()\n      : propertyKey;\n    descriptor.value = function (...args: unknown[]) {\n      log(logLevel, `call ${strPropertykey}, args: ${args}`);\n      const result = func.apply(this, args);\n      log(logLevel, `${strPropertykey} called, returnValue: ${result}`);\n      return result;\n    };\n  };\n}\n\n// ---------------------------------------------\n// 実際に使うとき\n\nclass Calculate {\n  @Logging(\"info\")\n  // このmethodが実行された後にdifineTask('calclateExecutedTask')で宣言されているTaskを実行する\n  @afterCallTask(\"calculateExecutedTask\")\n  sum(a: number, b: number) {\n    return a + b;\n  }\n}\n\nclass _Task {\n  @defineTask(\"calculateExecutedTask\")\n  // 引数の型は@atterCallTask()デコレーターをつけた関数の返り値\n  calculateExecutedTask(_sum: number) {\n    console.log(\"call task.calculate\");\n  }\n}\n\n\nconst _result = new Calculate().sum(1, 2);\n```\n\n実行結果\n\n```\ncall sum, args: 1,2\ncall task.calculate\nsum called, returnValue: 30\n```",
+      "body_updated_at": "2022-09-27"
+    }
+  ]
+}
