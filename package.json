@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "new:article": "npx zenn new:article --slug $(git rev-parse --abbrev-ref HEAD)-$(date +%yy%mm%dd)",
+    "preview": "npx zenn preview"
   },
   "repository": {
     "type": "git",
