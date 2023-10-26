@@ -3,7 +3,7 @@ title: "良いコード/悪いコードで学ぶ設計入門を読みました�
 emoji: "😎"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["typescript"]
-published: true 
+published: false 
 ---
 
 # この記事について
