@@ -3,7 +3,8 @@ title: "zodの実装を少しだけ読んでみた"
 emoji: "📑"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["typescript", "zod"]
-published: true 
+published: true
+publication_name: minma
 ---
 
 # はじめに
